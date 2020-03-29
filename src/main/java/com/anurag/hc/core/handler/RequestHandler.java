@@ -10,10 +10,13 @@
 package com.anurag.hc.core.handler;
 
 import com.anurag.hc.model.HealthCheckModel;
+import com.anurag.hc.model.LatencyData;
 
 public interface RequestHandler {
 
     public HealthCheckModel processApi(HealthCheckModel apiDetails);
+
+    public Boolean saveLatencyData(LatencyData latencyData);
 
 
 }

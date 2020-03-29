@@ -13,24 +13,37 @@ import com.anurag.hc.config.InfluxDBConfig;
 import com.anurag.hc.model.InfluxDBSaveModel;
 import org.influxdb.dto.Point;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.core.publisher.Mono;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class InfluxServiceImpl implements InfluxService {
 
     @Autowired
     private InfluxDBConfig influxDBConfig;
 
+    @Autowired
+    ApplicationContext applicationContext;
+
     @Override
-    public Mono<Boolean> save(InfluxDBSaveModel influxDBSaveModel) {
-        Point point = Point.measurement("table_name")
+    public Boolean save(InfluxDBSaveModel influxDBSaveModel) {
+        Environment environment = applicationContext.getEnvironment();
+        Point point = Point.measurement(influxDBSaveModel.getApiName())
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("name", influxDBSaveModel.getApiName())
                 .addField("latency", influxDBSaveModel.getApiLatency())
                 .addField("status", influxDBSaveModel.getApiStatus())
                 .build();
-        influxDBConfig.influxDB().write(point);
-        return null;
+        try {
+            influxDBConfig.influxDB().write(environment.getProperty("influx.db.name"),
+                    "autogen",
+                    point);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
