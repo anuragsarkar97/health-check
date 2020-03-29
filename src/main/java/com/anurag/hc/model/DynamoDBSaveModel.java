@@ -12,6 +12,8 @@ package com.anurag.hc.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -37,5 +39,22 @@ public class DynamoDBSaveModel {
     private RequestType requestType;
     @JsonProperty("variable")
     private String variable;
+
+    public void setVariable(Map variables) {
+        StringBuilder sb = new StringBuilder("{");
+        variables.forEach((k, v) -> {
+                    sb
+                    .append("\"")
+                    .append(k)
+                    .append("\":")
+                    .append("\"")
+                    .append(v)
+                    .append("\",");
+        });
+        String toString = sb.toString();
+        toString = toString.substring(0, toString.length()-1);
+        toString += "}";
+        this.variable = toString;
+    }
 
 }

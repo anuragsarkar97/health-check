@@ -23,7 +23,7 @@ public class Controller {
     public HealthCheckModel triggerJob(@RequestParam("job_id") String jobId) {
         System.out.println("received request trigger");
         try {
-            return checkerService.triggerApi(jobId);
+            return checkerService.getDynamoDbData(jobId);
         } catch (Exception e) {
             return null;
         }
@@ -31,11 +31,16 @@ public class Controller {
 
     @PostMapping("/save_data")
     public Boolean saveLatencyData(@RequestBody LatencyData latencyData) {
-        return checkerService.saveData(latencyData);
+        return checkerService.saveDataInfluxDb(latencyData);
     }
 
     @PostMapping("/add/single_step")
     public Status addHealthCheck(@RequestBody HealthCheckModel healthCheckModel) {
-        return Status.SUCCESS;
+        Boolean status = checkerService.saveToDynamoDb(healthCheckModel);
+        if(status) {
+            return Status.SUCCESS;
+        } else {
+            return Status.FAILED;
+        }
     }
 }

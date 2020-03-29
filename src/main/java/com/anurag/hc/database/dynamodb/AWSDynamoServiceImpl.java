@@ -11,12 +11,14 @@ package com.anurag.hc.database.dynamodb;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
+import com.amazonaws.services.dynamodbv2.model.PutItemResult;
 import com.anurag.hc.config.DynamoDBConfig;
 import com.anurag.hc.model.DynamoDBSaveModel;
 import com.anurag.hc.model.HealthCheckModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -33,12 +35,12 @@ public class AWSDynamoServiceImpl implements AWSDynamoService {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Value("${dynamo.db.table}")
-    private String tableName;
-
+    @Autowired
+    ApplicationContext applicationContext;
 
     @Override
     public Boolean save(DynamoDBSaveModel saveObject) {
+        Environment environment = applicationContext.getEnvironment();
         HashMap<String, AttributeValue> values = new HashMap<>();
         values.put(NAME, new AttributeValue(saveObject.getName()));
         values.put(JOB_ID, new AttributeValue(saveObject.getJobId()));
@@ -50,7 +52,7 @@ public class AWSDynamoServiceImpl implements AWSDynamoService {
         values.put(PARAMS, new AttributeValue(saveObject.getParam()));
         values.put(REQUEST_TYPE, new AttributeValue(saveObject.getRequestType().toString()));
         try {
-            dynamoDBConfig.amazonDynamoDB().putItem(tableName, values);
+            PutItemResult putItemResult = dynamoDBConfig.amazonDynamoDB().putItem(environment.getProperty("dynamo.db.table"), values);
             return true;
         } catch (Exception e) {
             return false;
@@ -59,12 +61,13 @@ public class AWSDynamoServiceImpl implements AWSDynamoService {
 
     @Override
     public HealthCheckModel findById(String id) {
+        Environment environment = applicationContext.getEnvironment();
         HashMap<String, AttributeValue> keys = new HashMap<>();
         keys.put(JOB_ID, new AttributeValue(id));
         GetItemRequest request = null;
         request = new GetItemRequest()
                 .withKey(keys)
-                .withTableName(tableName);
+                .withTableName(environment.getProperty("dynamo.db.table"));
         Map<String, AttributeValue> returnedItem = dynamoDBConfig.amazonDynamoDB()
                 .getItem(request)
                 .getItem();

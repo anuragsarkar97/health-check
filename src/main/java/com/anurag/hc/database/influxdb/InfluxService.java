@@ -15,6 +15,7 @@ public interface InfluxService {
 
     Boolean save(InfluxDBSaveModel healthCheckData);
 
+//    <T> T query(T queryString);
 
 }
 
