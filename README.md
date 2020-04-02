@@ -38,7 +38,7 @@ this is the overview of the service architecture.
 Multi region testing is completely configurable and can be modified. It uses CloudWatch cron to trigger health-checks.
 
  
-![Screenshot](img/Screenshot%202020-03-31%20at%2011.45.27%20PM.png)
+![Screenshot](img/Untitled%20Diagram.png)
 
 
 ## Current Dev
@@ -47,5 +47,3 @@ Multi region testing is completely configurable and can be modified. It uses Clo
 2. Multi step API [![start with why](https://img.shields.io/badge/status-dev-blue)]()
 3. multi DB configuration [![start with why](https://img.shields.io/badge/status-design-gray)]()
 4. Multi region deployment [![start with why](https://img.shields.io/badge/status-dev-blue)]()
-
-
