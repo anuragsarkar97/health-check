@@ -37,8 +37,10 @@ It supports single step and multi-step api testing for your CRUD requirements. `
 this is the overview of the service architecture.
 Multi region testing is completely configurable and can be modified. It uses CloudWatch cron to trigger health-checks.
 
- 
-![Screenshot](img/Untitled%20Diagram.png)
+
+<p align="center">
+  <img width="460" height="300" src="img/Untitled Diagram.png">
+</p>
 
 
 ## Current Dev
