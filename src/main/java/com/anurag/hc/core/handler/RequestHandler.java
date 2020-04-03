@@ -16,8 +16,10 @@ public interface RequestHandler {
 
     public HealthCheckModel processApi(HealthCheckModel apiDetails);
 
-    public Boolean saveLatencyData(LatencyData latencyData);
+    public Boolean save(LatencyData latencyData);
 
+    public Boolean save(HealthCheckModel healthCheckModel);
 
+    public <T> T fetchData(String jobId, T returnType);
 }
 

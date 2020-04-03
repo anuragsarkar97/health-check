@@ -1,46 +1,40 @@
 package com.anurag.hc.api;
 
+import com.anurag.hc.constants.RestEndpoints;
+import com.anurag.hc.core.handler.RequestHandler;
 import com.anurag.hc.model.HealthCheckModel;
 import com.anurag.hc.model.LatencyData;
-import com.anurag.hc.model.Status;
-import com.anurag.hc.service.CheckerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Slf4j
 public class Controller {
 
+
     @Autowired
-    CheckerService checkerService;
+    RequestHandler requestHandler;
 
-    @GetMapping("/ping")
-    public String getStatus() {
-        System.out.println("received request");
-        return "OK";
+    @GetMapping(RestEndpoints.PING)
+    public ResponseEntity<Void> getStatus() {
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/trigger")
-    public HealthCheckModel triggerJob(@RequestParam("job_id") String jobId) {
-        System.out.println("received request trigger");
-        try {
-            return checkerService.getDynamoDbData(jobId);
-        } catch (Exception e) {
-            return null;
-        }
+    @GetMapping(RestEndpoints.GETINFO)
+    public ResponseEntity<HealthCheckModel> triggerJob(@RequestParam("job_id") String jobId) {
+        return new ResponseEntity<>(requestHandler.fetchData(jobId, new HealthCheckModel()), HttpStatus.OK);
     }
 
-    @PostMapping("/save_data")
+    @PostMapping(RestEndpoints.SAVE)
     public Boolean saveLatencyData(@RequestBody LatencyData latencyData) {
-        return checkerService.saveDataInfluxDb(latencyData);
+        return requestHandler.save(latencyData);
     }
 
-    @PostMapping("/add/single_step")
-    public Status addHealthCheck(@RequestBody HealthCheckModel healthCheckModel) {
-        Boolean status = checkerService.saveToDynamoDb(healthCheckModel);
-        if(status) {
-            return Status.SUCCESS;
-        } else {
-            return Status.FAILED;
-        }
+    @PostMapping(RestEndpoints.ADD)
+    public Boolean addHealthCheck(@RequestBody HealthCheckModel healthCheckModel) {
+        return requestHandler.save(healthCheckModel);
     }
 }
